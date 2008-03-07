@@ -24,10 +24,17 @@ anotherPanel.setLayout(new RelativeLayout());
 When you add a component to a container in Swing, the `add()` method can take as a parameter an additional arbitrary object which is passed to the layout manager to determine how the added component should be laid out.  This object is typically referred to as the "constraints" for the component.  RelativeLayout uses a constraints object called a RelativeConstraints, which should be added along with each component that is added to the layout.  For example:
 
 {{{
+// First we create our panel with a RelativeLayout:
 JPanel panel = new JPanel(new RelativeLayout());
 
-JButton button = new JButton("OK");
+// Now let's create a button:
+JButton button = new JButton(OK");
+
+// We have to create a RelativeConstraints object so we can add the button.
+// This particular constraints object is empty, so it's not very interesting.
 RelativeConstraints constraints = new RelativeConstraints();
+
+// Add the button to the panel with the constraints:
 panel.add(button, constraints);
 }}}
 
