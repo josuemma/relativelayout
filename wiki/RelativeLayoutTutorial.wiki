@@ -1,0 +1,36 @@
+#summary A simple tutorial showing how to use RelativeLayout to build an interface.
+
+= Introduction =
+
+There are three ways to use RelativeLayout; some of them are simpler, while others offer more flexibility for more complex interfaces.  This tutorial will show you how to build a simple interface using [BindingFactory], a slightly more interesting interface using [Binding]s, and a complex interface using [RelativePosition]s and [Binding]s together.
+
+= General Principles =
+
+== Construction ==
+
+RelativeLayout is a Swing layout manager, which means it follows certain conventions that are common to layout managers in Swing.  In particular, you can set a RelativeLayout as the layout manager for a control by passing a new RelativeLayout object as the parameter to a !JPanel or !JFrame constructor, or by calling `setLayout()` with a RelativeLayout as the parameter on any Container class.  For example:
+
+{{{
+// Passing a RelativeLayout in the constructor:
+JPanel panel = new JPanel(new RelativeLayout());
+
+// Setting a RelativeLayout as the layout after construction:
+JPanel anotherPanel = new JPanel();
+anotherPanel.setLayout(new RelativeLayout());
+}}}
+
+== Constraints ==
+
+When you add a component to a container in Swing, the `add()` method can take as a parameter an additional arbitrary object which is passed to the layout manager to determine how the added component should be laid out.  This object is typically referred to as the "constraints" for the component.  RelativeLayout uses a constraints object called a RelativeConstraints, which should be added along with each component that is added to the layout.  For example:
+
+{{{
+JPanel panel = new JPanel(new RelativeLayout());
+
+JButton button = new JButton("OK");
+RelativeConstraints constraints = new RelativeConstraints();
+panel.add(button, constraints);
+}}}
+
+= BindingFactory =
+
+The simplest way to create an interface with RelativeLayout is to use the BindingFactory class to generate bindings for you.
