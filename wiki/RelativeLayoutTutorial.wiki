@@ -28,7 +28,7 @@ When you add a component to a container in Swing, the `add()` method can take as
 JPanel panel = new JPanel(new RelativeLayout());
 
 // Now let's create a button:
-JButton button = new JButton(OK");
+JButton button = new JButton("OK");
 
 // We have to create a RelativeConstraints object so we can add the button.
 // This particular constraints object is empty, so it's not very interesting.
@@ -37,6 +37,8 @@ RelativeConstraints constraints = new RelativeConstraints();
 // Add the button to the panel with the constraints:
 panel.add(button, constraints);
 }}}
+
+RelativeConstraints objects are just sets of [Binding]s, which actually determine where a component appears inside its parent.  There are several ways of creating and using bindings, and creating bindings is what the rest of this tutorial is about.
 
 = BindingFactory =
 
