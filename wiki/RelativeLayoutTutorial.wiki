@@ -172,3 +172,95 @@ We call this a degenerate layout because if the Send button was the same size as
 == Binding ==
 
 Although BindingFactory is sufficient for many interfaces, some more complex interfaces require a bit more flexibility.  For example, consider this interface:
+
+http://relativelayout.googlecode.com/svn/wiki/simpleinterface3.png
+
+Although this seems straightforward at first, creating this interface with a BindingFactory would be troublesome.  Here's how we could do it (but feel free to skip this, because it's a bad idea):
+
+{{{
+JPanel panel = new JPanel(new RelativeLayout());
+
+JCheckBox hardwareAccelBox = new JCheckBox("Enable hardware acceleration");
+JCheckBox kungFuGripBox = new JCheckBox("with kung-fu grip");
+JCheckBox cherryOnTopBox = new JCheckBox("with cherry on top");
+
+JCheckBox printMoneyBox = new JCheckBox("Print money from optical drive slot");
+JRadioButton dollarsRadio = new JRadioButton("Dollars");
+JRadioButton eurosRadio = new JRadioButton("Euros");
+JRadioButton pesosRadio = new JRadioButton("Pesos");
+JRadioButton rublesRadio = new JRadioButton("Rubles");
+
+BindingFactory bf = new BindingFactory();
+
+panel.add(hardwareAccelBox, new RelativeConstraints(bf.leftEdge(), bf.topEdge()));
+bf.setLeftMargin(bf.getLeftMargin() + 12);
+panel.add(kungFuGripBox, new RelativeConstraints(bf.leftEdge(), bf.below(hardwareAccelBox)));
+panel.add(cherryOnTopBox, new RelativeConstraints(bf.leftEdge(), bf.below(kungFuGripBox)));
+bf.setLeftMargin(bf.getLeftMargin() - 12);
+
+bf.setVerticalSpacing(bf.getVerticalSpacing() + 16);
+panel.add(printMoneyBox, new RelativeConstraints(bf.leftEdge(), bf.below(cherryOnTopBox)));
+bf.setVerticalSpacing(bf.getVerticalSpacing() - 16);
+bf.setLeftMargin(bf.getLeftMargin() + 12);
+panel.add(dollarsRadio, new RelativeConstraints(bf.leftEdge(), bf.below(printMoneyBox)));
+panel.add(eurosRadio, new RelativeConstraints(bf.leftEdge(), bf.below(dollarsRadio)));
+panel.add(pesosRadio, new RelativeConstraints(bf.leftEdge(), bf.below(eurosRadio)));
+panel.add(rublesRadio, new RelativeConstraints(bf.leftEdge(), bf.below(pesosRadio)));
+bf.setLeftMargin(bf.getLeftMargin() - 12);
+}}}
+
+I hope you'll agree with me when I say that this is not optimal.  It works, but the abuse of the margins and spacing of the BindingFactory is liable to introduce subtle bugs that will be difficult to track down later.  We need something more powerful: we need the ability to specify pixel offsets directly.  To do this, we need to create our own Bindings.
+
+{{{
+JPanel panel = new JPanel(new RelativeLayout());
+
+JCheckBox hardwareAccelBox = new JCheckBox("Enable hardware acceleration");
+JCheckBox kungFuGripBox = new JCheckBox("with kung-fu grip");
+JCheckBox cherryOnTopBox = new JCheckBox("with cherry on top");
+
+JCheckBox printMoneyBox = new JCheckBox("Print money from optical drive slot");
+JRadioButton dollarsRadio = new JRadioButton("Dollars");
+JRadioButton eurosRadio = new JRadioButton("Euros");
+JRadioButton pesosRadio = new JRadioButton("Pesos");
+JRadioButton rublesRadio = new JRadioButton("Rubles");
+
+final int kMargin = 14;
+final int kIndent = 12;
+final int kWithinGroupSpacing = 4;
+final int kBetweenGroupSpacing = 20;
+
+Binding topLevelLeftEdge = new Binding(Edge.LEFT, kMargin, Direction.RIGHT, Edge.LEFT, Binding.PARENT);
+Binding indentedLeftEdge = new Binding(Edge.LEFT, kMargin + kIndent, Direction.RIGHT, Edge.LEFT, Binding.PARENT);
+
+Binding hardwareAccelBoxTop = new Binding(Edge.TOP, kMargin, Direction.BELOW, Edge.TOP, Binding.PARENT);
+Binding kungFuGripBoxTop = new Binding(Edge.TOP, kWithinGroupSpacing, Direction.BELOW, Edge.BOTTOM, hardwareAccelBox);
+Binding cherryOnTopBoxTop = new Binding(Edge.TOP, kWithinGroupSpacing, Direction.BELOW, Edge.BOTTOM, kungFuGripBox);
+
+Binding printMoneyBoxTop = new Binding(Edge.TOP, kBetweenGroupSpacing, Direction.BELOW, Edge.BOTTOM, cherryOnTopBox);
+Binding dollarsRadioTop = new Binding(Edge.TOP, kWithinGroupSpacing, Direction.BELOW, Edge.BOTTOM, printMoneyBox);
+Binding eurosRadioTop = new Binding(Edge.TOP, kWithinGroupSpacing, Direction.BELOW, Edge.BOTTOM, dollarsRadio);
+Binding pesosRadioTop = new Binding(Edge.TOP, kWithinGroupSpacing, Direction.BELOW, Edge.BOTTOM, eurosRadio);
+Binding rublesRadioTop = new Binding(Edge.TOP, kWithinGroupSpacing, Direction.BELOW, Edge.BOTTOM, pesosRadio);
+
+panel.add(hardwareAccelBox, new RelativeConstraints(topLevelLeftEdge, hardwareAccelBoxTop));
+panel.add(kungFuGripBox, new RelativeConstraints(indentedLeftEdge, kungFuGripBoxTop));
+panel.add(cherryOnTopBox, new RelativeConstraints(indentedLeftEdge, cherryOnTopBoxTop));
+
+panel.add(printMoneyBox, new RelativeConstraints(topLevelLeftEdge, printMoneyBoxTop));
+panel.add(dollarsRadio, new RelativeConstraints(indentedLeftEdge, dollarsRadioTop));
+panel.add(eurosRadio, new RelativeConstraints(indentedLeftEdge, eurosRadioTop));
+panel.add(pesosRadio, new RelativeConstraints(indentedLeftEdge, pesosRadioTop));
+panel.add(rublesRadio, new RelativeConstraints(indentedLeftEdge, rublesRadioTop));
+}}}
+
+The syntax for creating a Binding is very easy to remember: it is form of an English sentence.  The first Binding (`topLevelLeftEdge`) reads, "the `LEFT` edge is `kMargin` pixels to the `RIGHT` of the `LEFT` edge of the parent component."  Since we never specify the left edge of _what_, we can use the Binding over and over again to position multiple controls at the same horizontal distance.  With this code, it's a simple matter to tweak the constants and change the indentation or spacing of all the components in the window.
+
+By the way, reading that code you may have been thinking to yourself, "why is `PARENT` a special constant?  Why not just use `panel` in that spot instead?"  Indeed, you could do so, and it would work just fine:
+
+{{{
+Binding topLevelLeftEdge = new Binding(Edge.LEFT, kMargin, Direction.RIGHT, Edge.LEFT, panel);
+}}}
+
+The `PARENT` constant, however, allows you to re-use Bindings among controls that do not share the same parent, as the parent will not be resolved until the very last moment.  This is how BindingFactory returns Bindings that refer to the parent component without ever knowing what it is.
+
+== RelativePosition ==
