@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="javadoc">
+	<target name="javadoc">
+		<javadoc access="public" author="true" classpath="Jama-1.0.2.jar" destdir="doc" doctitle="RelativeLayout" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="edu.cmu.relativelayout.matrix,edu.cmu.relativelayout,edu.cmu.relativelayout.equation" source="1.5" sourcepath="." splitindex="true" use="true" version="true">
+			<link href="http://math.nist.gov/javanumerics/jama/doc/" />
+			<link href="http://java.sun.com/javase/6/docs/api/" />
+		</javadoc>
+	</target>
+</project>
