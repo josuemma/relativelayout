@@ -40,7 +40,9 @@ panel.add(button, constraints);
 
 RelativeConstraints objects are just sets of [Binding]s, which actually determine where a component appears inside its parent.  There are several ways of creating and using bindings, and creating bindings is what the rest of this tutorial is about.
 
-= BindingFactory =
+= Creating Bindings =
+
+== BindingFactory ==
 
 The simplest way to create an interface with RelativeLayout is to use the BindingFactory class to generate bindings for you.  Doing this is pretty straightforward; just create a BindingFactory object, specify the margin sizes and control spacing you want (or just accept the defaults), and then call the various positioning methods to churn out Bindings.  For example, let's say we want to create this very simple interface:
 
@@ -78,4 +80,95 @@ panel.add(button1, button1Constraints);
 panel.add(button2, button2Constraints);
 }}}
 
+And that's all there is to it.
+
+Let's try a slightly more interesting interface.  Here's what it looks like when it's small:
+
+http://relativelayout.googlecode.com/svn/wiki/simpleinterface2a.png
+
+and here's what it looks like when you resize it to be larger:
+
+http://relativelayout.googlecode.com/svn/wiki/simpleinterface2b.png
+
+Believe it or not, this interface is almost as easy to create as the first one.  The key is to think about which controls depend on other controls, and how.  Here's the code:
+
+{{{
+JPanel panel = new JPanel(new RelativeLayout());
+
+JScrollPane textPane = new JScrollPane(new JTextArea());
+JScrollPane userList = new JScrollPane(new JList());
+JTextField inputField = new JTextField();
+JButton sendButton = new JButton("Send");
+
+BindingFactory bf = new BindingFactory();
+
+// We'll make constraints for the textPane first:
+Binding leftEdge = bf.leftEdge();
+Binding topEdge = bf.topEdge();
+Binding aboveInputField = bf.above(inputField);
+Binding leftOfUserList = bf.leftOf(userList);
+// RelativeConstraints has a constructor that takes an arbitrary number of bindings, like this:
+RelativeConstraints textPaneConstraints
+    = new RelativeConstraints(leftEdge, topEdge, aboveInputField, leftOfUserList);
+
+// Now the user list:
+Binding rightEdge = bf.rightEdge();
+// Notice that we don't constrain the left edge. That's important, and we'll see why in a moment.
+RelativeConstraints userListConstraints
+    = new RelativeConstraints(topEdge, rightEdge, aboveInputField);
+
+// Now the input field:
+Binding bottomEdge = bf.bottomEdge();
+Binding leftOfSendButton = bf.leftOf(sendButton);
+RelativeConstraints inputFieldConstraints
+    = new RelativeConstraints(leftEdge, bottomEdge, leftOfSendButton);
+
+// And lastly, the send button:
+// Again notice that we don't constrain the left or top edges:
+RelativeConstraints sendButtonConstraints
+    = new RelativeConstraints(rightEdge, bottomEdge);
+
+panel.add(textPane, textPaneConstraints);
+panel.add(userList, userListConstraints);
+panel.add(inputField, inputFieldConstraints);
+panel.add(sendButton, sendButtonConstraints);
 }}}
+
+Not bad!  Now, you may be wondering why we didn't specify every edge of every control, and why we specifically left out the left edge of the user list and the left and top edges of the send button.  The reason is that all components in Swing have a "preferred size", and any time one edge of a component (say the right edge) is constrained and the other (say the left edge) isn't, the preferred size is used to determine how wide or tall the component will be.  This means that because we only specified the right edge of the Send button and not the left, it will always be exactly as wide as it needs to be to fit the text.  And because the right edge of the input field is specified in terms of the left edge of the Send button, the field will automatically get narrower if the Send button gets wider.  This makes localization very easy, because the controls in the window will automatically shift around as needed within the constraints you've specified.
+
+=== Degenerate Layouts ===
+
+In the above example, we made a potentially dangerous assumption.  We placed the input field to the left of the Send button, aligned them both to the bottom edge of the window, and then put the text pane above the input field.  That works great as long as the Send button is the same height as the input field, but what if it's not?
+
+http://relativelayout.googlecode.com/svn/wiki/simpleinterface2c.png
+
+Hm, that's no good.  Fortunately, there are always multiple different layouts that will result in basically the same interface, so we can fix the problem by switching to another one that doesn't make that assumption.  Let's change how the text pane is defined:
+
+{{{
+Binding leftEdge = bf.leftEdge();
+Binding topEdge = bf.topEdge();
+Binding aboveSendButton = bf.above(sendButton);
+Binding leftOfUserList = bf.leftOf(userList);
+// RelativeConstraints has a constructor that takes an arbitrary number of bindings, like this:
+RelativeConstraints textPaneConstraints
+    = new RelativeConstraints(leftEdge, topEdge, aboveSendButton, leftOfUserList);
+}}}
+
+Okay, that fixes the overlap, but now the input field will be aligned to the bottom of the Send button.  Let's align it to the vertical center instead:
+
+{{{
+Binding vAlignOnSendButton = bf.verticallyCenterAlignedWith(sendButton);
+Binding leftOfSendButton = bf.leftOf(sendButton);
+RelativeConstraints inputFieldConstraints
+    = new RelativeConstraints(leftEdge, vAlignOnSendButton, leftOfSendButton);
+}}}
+
+Now our interface looks like this:
+
+http://relativelayout.googlecode.com/svn/wiki/simpleinterface2d.png
+
+We call this a degenerate layout because if the Send button was the same size as in the initial screen shots, this code would result in exactly the same positioning of the controls.  The difference is that they would be positioned there for a different _reason_.  This gives you as the designer a way of writing your intent into the code so that it will be especially robust.
+
+== Binding ==
+
+Although BindingFactory is sufficient for many interfaces, some more complex interfaces require a bit more flexibility.  For example, consider this interface:
