@@ -42,4 +42,34 @@ RelativeConstraints objects are just sets of [Binding]s, which actually determin
 
 = BindingFactory =
 
-The simplest way to create an interface with RelativeLayout is to use the BindingFactory class to generate bindings for you.
+The simplest way to create an interface with RelativeLayout is to use the BindingFactory class to generate bindings for you.  Doing this is pretty straightforward; just create a BindingFactory object, specify the margin sizes and control spacing you want (or just accept the defaults), and then call the various positioning methods to churn out Bindings.  For example, let's say we want to create this very simple interface:
+
+
+
+We can do this with BindingFactory with the following code (note that in this example, we sacrifice brevity for clarity, so this is a lot more code than you'd actually have to write for this):
+
+{{{
+JPanel panel = new JPanel(new RelativeLayout());
+
+JButton button1 = new JButton("Button 1");
+JButton button2 = new JButton("Button 2");
+
+BindingFactory bf = new BindingFactory();
+
+Binding leftEdge = bf.leftEdge();
+Binding topEdge = bf.topEdge();
+Binding rightOfButton1 = bf.rightOf(button1);
+
+RelativeConstraints button1Constraints = new RelativeConstraints();
+button1Constraints.addBinding(leftEdge);
+button1Constraints.addBinding(topEdge);
+
+RelativeConstraints button2Constraints = new RelativeConstraints();
+button2Constraints.addBinding(rightOfButton1);
+button2Constraints.addBinding(topEdge);
+
+panel.add(button1, button1Constraints);
+panel.add(button2, button2Constraints);
+}}}
+
+}}}
