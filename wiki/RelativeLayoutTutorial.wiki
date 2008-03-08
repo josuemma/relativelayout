@@ -337,7 +337,7 @@ No problem.  We just use the horizontal center of the window as our anchor and o
 
 Okay, so what about this one?
 
-http://relativelayout.googlecode.com/svn/wiki/impossible1.png
+http://relativelayout.googlecode.com/svn/wiki/impossible3.png
 
 Assuming the same proportional resizing behavior, we can do this one by...  well, actually, we can't.  At all.  It's impossible, because we'd need to anchor to a point one-third of the distance from the left edge of the window to the right edge, minus half the distance between the panels, minus the left margin.  Apart from being head-explodingly unintuitive, we simply don't have the language we need to say that.  So what do we do?  We do this:
 
