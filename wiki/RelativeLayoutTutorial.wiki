@@ -325,7 +325,7 @@ JTextArea area2 = new JTextArea();
 Binding area1LeftEdge = new Binding(Edge.LEFT, 20, Direction.RIGHT, Edge.LEFT, Binding.PARENT);
 Binding area1RightEdge = new Binding(Edge.RIGHT, 4, Direction.LEFT, Edge.HORIZONTAL_CENTER, Binding.PARENT);
 Binding area2LeftEdge = new Binding(Edge.LEFT, 4, Direction.RIGHT, Edge.HORIZONTAL_CENTER, Binding.PARENT);
-Binding 2RightEdge = new Binding(Edge.RIGHT, 20, Direction.LEFT, Edge.RIGHT, Binding.PARENT);
+Binding area2RightEdge = new Binding(Edge.RIGHT, 20, Direction.LEFT, Edge.RIGHT, Binding.PARENT);
 Binding top = new Binding(Edge.TOP, 20, Direction.BELOW, Edge.TOP, Binding.PARENT);
 Binding bottom = new Binding(Edge.BOTTOM, 20, Direction.ABOVE, Edge.BOTTOM, Binding.PARENT);
 
