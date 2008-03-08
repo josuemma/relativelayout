@@ -288,8 +288,8 @@ final int kBetweenGroupSpacing = 20;
 Binding topLevelLeftEdge = new Binding(Edge.LEFT, kMargin, Direction.RIGHT, Edge.LEFT, Binding.PARENT);
 Binding indentedLeftEdge = new Binding(Edge.LEFT, kMargin + kIndent, Direction.RIGHT, Edge.LEFT, Binding.PARENT);
 
-RelativePosition withinGroupBelow = new RelativePosition(Edge.TOP, kWithinGroupSpacing, Direction.Binding, Edge.BOTTOM);
-RelativePosition betweenGroupBelow = new RelativePosition(Edge.TOP, kBetweenGroupSpacing, Direction.Binding, Edge.BOTTOM);
+RelativePosition withinGroupBelow = new RelativePosition(Edge.TOP, kWithinGroupSpacing, Direction.BELOW, Edge.BOTTOM);
+RelativePosition betweenGroupBelow = new RelativePosition(Edge.TOP, kBetweenGroupSpacing, Direction.BELOW, Edge.BOTTOM);
 
 Binding hardwareAccelBoxTop = new Binding(Edge.TOP, kMargin, Direction.BELOW, Edge.TOP, Binding.PARENT);
 
