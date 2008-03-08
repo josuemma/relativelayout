@@ -319,8 +319,8 @@ Well, sure, we can do that.  Here:
 {{{
 JPanel panel = new JPanel(new RelativeLayout());
 
-JTextArea area1 = new JTextArea();
-JTextArea area2 = new JTextArea();
+JScrollPane area1 = new JScrollPane(new JTextArea());
+JScrollPane area2 = new JScrollPane(new JTextArea());
 
 Binding area1LeftEdge = new Binding(Edge.LEFT, 20, Direction.RIGHT, Edge.LEFT, Binding.PARENT);
 Binding area1RightEdge = new Binding(Edge.RIGHT, 4, Direction.LEFT, Edge.HORIZONTAL_CENTER, Binding.PARENT);
