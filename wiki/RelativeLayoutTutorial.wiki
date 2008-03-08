@@ -38,7 +38,7 @@ RelativeConstraints constraints = new RelativeConstraints();
 panel.add(button, constraints);
 }}}
 
-RelativeConstraints objects are just sets of [Binding]s, which actually determine where a component appears inside its parent.  There are several ways of creating and using bindings, and creating bindings is what the rest of this tutorial is about.
+RelativeConstraints objects are just sets of [Binding]s, which actually determine where a component appears inside its parent.  If, as in the above example, the position and size of a component isn't specified by the constraints, it will default to being in the upper left corner of the window with its preferred size (as from calling `getPreferredSize()`). There are several ways of creating and using bindings, and creating bindings is what the rest of this tutorial is about.
 
 = Creating Bindings =
 
@@ -224,7 +224,7 @@ JRadioButton eurosRadio = new JRadioButton("Euros");
 JRadioButton pesosRadio = new JRadioButton("Pesos");
 JRadioButton rublesRadio = new JRadioButton("Rubles");
 
-final int kMargin = 14;
+final int kMargin = 20;
 final int kIndent = 12;
 final int kWithinGroupSpacing = 4;
 final int kBetweenGroupSpacing = 20;
@@ -264,3 +264,83 @@ Binding topLevelLeftEdge = new Binding(Edge.LEFT, kMargin, Direction.RIGHT, Edge
 The `PARENT` constant, however, allows you to re-use Bindings among controls that do not share the same parent, as the parent will not be resolved until the very last moment.  This is how BindingFactory returns Bindings that refer to the parent component without ever knowing what it is.
 
 == RelativePosition ==
+
+Although that last bit of code gets the job done and is reasonably clear, it's still not perfect.  Although we can reuse `topLevelLeftEdge` and `indentedLeftEdge`, we have to construct a new Binding for the vertical position of every component, because the component it's relative to is always changing.  Wouldn't it be nice if we could abstract that component away too?  We can, by using the RelativePosition class:
+
+{{{
+JPanel panel = new JPanel(new RelativeLayout());
+
+JCheckBox hardwareAccelBox = new JCheckBox("Enable hardware acceleration");
+JCheckBox kungFuGripBox = new JCheckBox("with kung-fu grip");
+JCheckBox cherryOnTopBox = new JCheckBox("with cherry on top");
+
+JCheckBox printMoneyBox = new JCheckBox("Print money from optical drive slot");
+JRadioButton dollarsRadio = new JRadioButton("Dollars");
+JRadioButton eurosRadio = new JRadioButton("Euros");
+JRadioButton pesosRadio = new JRadioButton("Pesos");
+JRadioButton rublesRadio = new JRadioButton("Rubles");
+
+final int kMargin = 20;
+final int kIndent = 12;
+final int kWithinGroupSpacing = 4;
+final int kBetweenGroupSpacing = 20;
+
+Binding topLevelLeftEdge = new Binding(Edge.LEFT, kMargin, Direction.RIGHT, Edge.LEFT, Binding.PARENT);
+Binding indentedLeftEdge = new Binding(Edge.LEFT, kMargin + kIndent, Direction.RIGHT, Edge.LEFT, Binding.PARENT);
+
+RelativePosition withinGroupBelow = new RelativePosition(Edge.TOP, kWithinGroupSpacing, Direction.Binding, Edge.BOTTOM);
+RelativePosition betweenGroupBelow = new RelativePosition(Edge.TOP, kBetweenGroupSpacing, Direction.Binding, Edge.BOTTOM);
+
+Binding hardwareAccelBoxTop = new Binding(Edge.TOP, kMargin, Direction.BELOW, Edge.TOP, Binding.PARENT);
+
+panel.add(hardwareAccelBox, new RelativeConstraints(topLevelLeftEdge, hardwareAccelBoxTop));
+panel.add(kungFuGripBox, new RelativeConstraints(indentedLeftEdge, new Binding(withinGroupBelow, hardwareAccelBox)));
+panel.add(cherryOnTopBox, new RelativeConstraints(indentedLeftEdge, new Binding(withinGroupBelow, kungFuGripBox)));
+
+panel.add(printMoneyBox, new RelativeConstraints(topLevelLeftEdge, new Binding(betweenGroupBelow, cherryOnTopBox)));
+panel.add(dollarsRadio, new RelativeConstraints(indentedLeftEdge, new Binding(withinGroupBelow, printMoneyBox)));
+panel.add(eurosRadio, new RelativeConstraints(indentedLeftEdge, new Binding(withinGroupBelow, dollarsRadio)));
+panel.add(pesosRadio, new RelativeConstraints(indentedLeftEdge, new Binding(withinGroupBelow, eurosRadio)));
+panel.add(rublesRadio, new RelativeConstraints(indentedLeftEdge, new Binding(withinGroupBelow, pesosRadio)));
+}}}
+
+Notice that the first four arguments to the constructor for Binding can instead be composed into a RelativePosition and passed in later as a single object to the Binding constructor.  This allows you to reuse them the same way you can reuse the Bindings themselves.
+
+= Pitfalls =
+
+= Limitations =
+
+RelativeLayout is intended to make creating most interfaces, both simple and complex, as easy and painless as possible.  While this undoubtedly makes designing 95% of the interfaces you will want to create much easier than they would otherwise be, there are occasional interface designs that simply cannot be achieved.  For example, consider this interface (before and after resizing):
+
+http://relativelayout.googlecode.com/svn/wiki/impossible1.png
+http://relativelayout.googlecode.com/svn/wiki/impossible2.png
+
+Well, sure, we can do that.  Here:
+{{{
+JPanel panel = new JPanel(new RelativeLayout());
+
+JTextArea area1 = new JTextArea();
+JTextArea area2 = new JTextArea();
+
+Binding area1LeftEdge = new Binding(Edge.LEFT, 20, Direction.RIGHT, Edge.LEFT, Binding.PARENT);
+Binding area1RightEdge = new Binding(Edge.RIGHT, 4, Direction.LEFT, Edge.HORIZONTAL_CENTER, Binding.PARENT);
+Binding area2LeftEdge = new Binding(Edge.LEFT, 4, Direction.RIGHT, Edge.HORIZONTAL_CENTER, Binding.PARENT);
+Binding 2RightEdge = new Binding(Edge.RIGHT, 20, Direction.LEFT, Edge.RIGHT, Binding.PARENT);
+Binding top = new Binding(Edge.TOP, 20, Direction.BELOW, Edge.TOP, Binding.PARENT);
+Binding bottom = new Binding(Edge.BOTTOM, 20, Direction.ABOVE, Edge.BOTTOM, Binding.PARENT);
+
+panel.add(area1, new RelativeConstraints(area1LeftEdge, area1RightEdge, top, bottom));
+panel.add(area2, new RelativeConstraints(area2LeftEdge, area2RightEdge, top, bottom));
+}}}
+
+No problem.  We just use the horizontal center of the window as our anchor and offset each edge by half the distance between them.
+
+Okay, so what about this one?
+
+http://relativelayout.googlecode.com/svn/wiki/impossible1.png
+
+Assuming the same proportional resizing behavior, we can do this one by...  well, actually, we can't.  At all.  It's impossible, because we'd need to anchor to a point one-third of the distance from the left edge of the window to the right edge, minus half the distance between the panels, minus the left margin.  Apart from being head-explodingly unintuitive, we simply don't have the language we need to say that.  So what do we do?  We do this:
+
+{{{
+
+}}}
