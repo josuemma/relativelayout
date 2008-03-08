@@ -44,7 +44,7 @@ RelativeConstraints objects are just sets of [Binding]s, which actually determin
 
 The simplest way to create an interface with RelativeLayout is to use the BindingFactory class to generate bindings for you.  Doing this is pretty straightforward; just create a BindingFactory object, specify the margin sizes and control spacing you want (or just accept the defaults), and then call the various positioning methods to churn out Bindings.  For example, let's say we want to create this very simple interface:
 
-http://code.google.com/p/relativelayout/w/simpleinterface1.png
+http://relativelayout.googlecode.com/svn/wiki/simpleinterface1.png
 
 We can do this with BindingFactory with the following code (note that in this example, we sacrifice brevity for clarity, so this is a lot more code than you'd actually have to write for this):
 
