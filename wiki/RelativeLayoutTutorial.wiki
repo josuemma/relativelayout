@@ -342,5 +342,19 @@ http://relativelayout.googlecode.com/svn/wiki/impossible3.png
 Assuming the same proportional resizing behavior, we can do this one by...  well, actually, we can't.  At all.  It's impossible, because we'd need to anchor to a point one-third of the distance from the left edge of the window to the right edge, minus half the distance between the panels, minus the left margin.  Apart from being head-explodingly unintuitive, we simply don't have the language we need to say that.  So what do we do?  We do this:
 
 {{{
+JPanel panel = new JPanel(new RelativeLayout());
 
+JScrollPane area1 = new JScrollPane(new JTextArea());
+JScrollPane area2 = new JScrollPane(new JTextArea());
+JScrollPane area3 = new JScrollPane(new JTextArea());
+
+JPanel innerPanel = new JPanel(new GridLayout(1, 3, 8, 0));
+innerPanel.add(area1);
+innerPanel.add(area2);
+innerPanel.add(area3);
+
+BindingFactory bf = new BindingFactory();
+panel.add(innerPanel, new RelativeConstraints(bf.topEdge(), bf.leftEdge(), bf.bottomEdge(), bf.rightEdge()));
 }}}
+
+A cop-out, you say?  Maybe, but this example serve to illustrate one of the best qualities of RelativeLayout: it clears the way for Java's other layout managers to be used for _things they're actually good at, and nothing else_.  You want a bunch of proportionally resizing panes arrayed in a grid?  use GridLayout.  You want a collection of icons or small views that will arrange themselves like words in a text editor as you resize the window?  Use FlowLayout.  You want to actually write the GUI of your application?  That's when you use RelativeLayout.
