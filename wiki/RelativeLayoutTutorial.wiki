@@ -54,12 +54,17 @@ JPanel panel = new JPanel(new RelativeLayout());
 JButton button1 = new JButton("Button 1");
 JButton button2 = new JButton("Button 2");
 
+// Create a BindingFactory with the default margin and control spacing:
 BindingFactory bf = new BindingFactory();
 
+// Make some bindings using our BindingFactory.  Note how leftEdge() and topEdge() don't 
+// take any arguments, but rightOf() needs the control we want to be to the right of.
 Binding leftEdge = bf.leftEdge();
 Binding topEdge = bf.topEdge();
 Binding rightOfButton1 = bf.rightOf(button1);
 
+// Create a constraints object for each component, and add the bindings to the 
+// constraints:
 RelativeConstraints button1Constraints = new RelativeConstraints();
 button1Constraints.addBinding(leftEdge);
 button1Constraints.addBinding(topEdge);
@@ -68,6 +73,7 @@ RelativeConstraints button2Constraints = new RelativeConstraints();
 button2Constraints.addBinding(rightOfButton1);
 button2Constraints.addBinding(topEdge);
 
+// Lastly, add the components to the panel with the constraints:
 panel.add(button1, button1Constraints);
 panel.add(button2, button2Constraints);
 }}}
