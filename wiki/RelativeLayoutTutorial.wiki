@@ -2,13 +2,13 @@
 
 = Introduction =
 
-There are three ways to use RelativeLayout; some of them are simpler, while others offer more flexibility for more complex interfaces.  This tutorial will show you how to build a simple interface using [BindingFactory], a slightly more interesting interface using [Binding]s, and a complex interface using [RelativePosition]s and [Binding]s together.
+There are three ways to use RelativeLayout; some of them are simpler, while others offer more flexibility for more complex interfaces.  This tutorial will show you how to build a simple interface using BindingFactory, a slightly more interesting interface using Bindings, and a complex interface using RelativePositions and Bindings together.
 
 = General Principles =
 
 == Construction ==
 
-RelativeLayout is a Swing layout manager, which means it follows certain conventions that are common to layout managers in Swing.  In particular, you can set a RelativeLayout as the layout manager for a control by passing a new RelativeLayout object as the parameter to a !JPanel or !JFrame constructor, or by calling `setLayout()` with a RelativeLayout as the parameter on any Container class.  For example:
+RelativeLayout is a Swing layout manager, which means it follows certain conventions that are common to layout managers in Swing.  In particular, you can set a RelativeLayout as the layout manager for a control by passing a new RelativeLayout object as the parameter to a JPanel or JFrame constructor, or by calling `setLayout()` with a RelativeLayout as the parameter on any Container class.  For example:
 
 {{{
 // Passing a RelativeLayout in the constructor:
@@ -38,7 +38,7 @@ RelativeConstraints constraints = new RelativeConstraints();
 panel.add(button, constraints);
 }}}
 
-RelativeConstraints objects are just sets of [Binding]s, which actually determine where a component appears inside its parent.  If, as in the above example, the position and size of a component isn't specified by the constraints, it will default to being in the upper left corner of the window with its preferred size (as from calling `getPreferredSize()`). There are several ways of creating and using bindings, and creating bindings is what the rest of this tutorial is about.
+RelativeConstraints objects are just sets of Bindings, which actually determine where a component appears inside its parent.  If, as in the above example, the position and size of a component isn't specified by the constraints, it will default to being in the upper left corner of the window with its preferred size (as from calling `getPreferredSize()`). There are several ways of creating and using bindings, and creating bindings is what the rest of this tutorial is about.
 
 = Creating Bindings =
 
